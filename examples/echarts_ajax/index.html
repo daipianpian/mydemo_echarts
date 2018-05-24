@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>echarts_ajax</title>
+	<!-- 引入 ECharts 文件 -->
+    <script src="http://www.daipianpian.com/common/js/echarts.min.js"></script>
+    <link href="http://www.daipianpian.com/common/css/resetcsspc.css" rel="stylesheet">
+    <style>
+    	.demobox{width: 600px;height: auto;margin: 100px auto 0px;overflow: hidden;}
+		.tabnav{width: 100%;height: 40px;margin: 0 auto 50px;}
+	    .tabnav ul{width: 48%;height: 100%;margin: 0 auto;overflow: hidden;zoom: 1;}
+	    .tabnav li{float: left;width: 88px;height: 38px;line-height: 38px; margin-right: 8.6px;text-align: center;color: #333;font-size: 16px; background-color: #AADBCE;border: 1px solid #CEE8E0; border-radius: 4px;}
+	    .tabnav li.active{color: #000; border: 1px solid #a4604d;background-color: #fff;}
+	    .tabnav li:hover{cursor: pointer;}
+	    .tabnav li:last-child{margin-right: 0px;}
+        .main{width: 600px;height:400px;}
+    </style>
+</head>
+<body>
+	<div class="demobox">
+		<div class="tabnav">
+			<ul id="tab">
+				<li class="active">按天</li>
+				<li>按月</li>
+				<li>按年</li>
+			</ul>
+		</div>
+
+		<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+	    <div id="main" class="main"></div>
+    </div>
+    <script type="text/javascript">
+
+        var host = 'https://www.easy-mock.com/mock/5b06d6f072643c7a5c4edcb6/echarts';
+        //创建异步对象  
+        var xhr = new XMLHttpRequest();
+        function ajaxPost(url,type){
+            xhr.open('post',host+url,true);
+            xhr.setRequestHeader('content-type','application/x-www-form-urlencoded');
+            xhr.send('type='+type);
+            xhr.onreadystatechange = function(){
+                if( xhr.readyState==4 && xhr.status==200){
+                    
+                    var responseText = eval("("+xhr.responseText+")");
+                    //拿到数据后更新页面
+                    var option = responseText.data;
+                    console.log(option);
+                    myChart.setOption(option);
+                }
+            }            
+        }
+        ajaxPost('/day',1);
+
+    	// 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main'));
+
+    	var oli=document.getElementById('tab').getElementsByTagName('li');//获取tab列表
+        for(var i=0 ; i<oli.length ; i++){
+            oli[i].index = i;//定义index变量，以便让tab按钮和tab内容相互对应
+            oli[i].onclick = function(){//移除全部tab样式和tab内容
+            	// 使用刚指定的配置项和数据显示图表。
+        		// myChart.setOption(eval('option'+this.index));
+                console.log('this.index='+this.index); 
+
+                if(this.index==0){
+                    ajaxPost('/day',1);
+                }
+                if(this.index==1){
+                    ajaxPost('/month',2);
+                }
+                if(this.index==2){
+                    ajaxPost('/year',3);
+                }
+                
+
+	            for(var i =0; i < oli.length; i++){
+	                oli[i].className = '';
+	            }
+	            this.className = 'active';//为当前tab添加样式
+
+	            
+            }
+        }
+       
+    </script>
+</body>
+</html>
